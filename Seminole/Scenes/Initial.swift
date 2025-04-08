@@ -1,10 +1,3 @@
-//
-//  Initial.swift
-//  Seminole
-//
-//  Created by Pavel Ivanov on 17.03.2025.
-//
-
 import SwiftUI
 
 @main
@@ -23,11 +16,20 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
-        let currentScreen = ShopStorage.shared.currentScreen
-        if currentScreen == "greeting" {
-            return .allButUpsideDown
-        } else {
+        if OrientationManager.shared.isHorizontalLock {
             return .portrait
+        } else {
+            return .allButUpsideDown
         }
+        
+//        let currentScreen = ShopStorage.shared.currentScreen
+//        if currentScreen == "greeting" {
+//            return .allButUpsideDown
+//        } else {
+//            return .portrait
+//        }
+    
     }
+    
 }
+

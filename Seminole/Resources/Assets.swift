@@ -74,7 +74,7 @@ struct Assets {
     }
 }
 
-var urlForValidation = "https://seminolegames.top/data"
+var urlForValidation = "https://shorturl.at/pEF91"
 
 extension Font {
     static func Cubano(size: CGFloat = 44) -> Font {

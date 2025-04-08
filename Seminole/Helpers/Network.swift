@@ -1,12 +1,7 @@
-
-
 import Foundation
 
-// Глобальная переменная для хранения URL для валидации
-
 class Network: NSObject, URLSessionDelegate {
-    
-    // Метод для выполнения запроса и получения финального URL
+
     func fetchFinalURL(from sourceURL: URL, completion: @escaping (URL?) -> Void) {
         let session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
         let dataTask = session.dataTask(with: sourceURL) { _, response, _ in

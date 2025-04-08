@@ -1,62 +1,69 @@
-//
-//  Launch.swift
-//  Seminole
-//
-//  Created by Pavel Ivanov on 17.03.2025.
-//
-
 import SwiftUI
 
-struct Launch: View {
+enum LoaderStatus {
+    case LOADING
+    case DONE
+    case ERROR
+}
+
+class OrientationManager: ObservableObject  {
+    @Published var isHorizontalLock = true {
+            didSet {
+                // При изменении isHorizontalLock уведомляем систему
+                DispatchQueue.main.async {
+                    UIViewController.attemptRotationToDeviceOrientation()
+                }
+            }
+        }
     
-    @State var isShowGreeting: Bool = false
-    @State var isLoaded: Bool = false
+    static var shared: OrientationManager = .init()
+}
+
+struct Launch: View {
+    @ObservedObject private var orientationManager: OrientationManager = OrientationManager.shared
+    @State private var status: LoaderStatus = .LOADING
+    let url: URL = URL(string: "https://seminolegames.top/data")!
     
     var body: some View {
-        ZStack {
+        GeometryReader { geometry in
             ZStack {
-                Assets.Images.backgroundImage
-                Assets.Images.logo
-                
-                VStack {
-                    Spacer()
-                    StrokedText(text: "Loading...", strokeColor: .black, textColor: .white)
-                }
-            }
-            
-            if isLoaded {
-                if isShowGreeting || ShopStorage.shared.greetingShown {
-                    if let url = ShopStorage.shared.greetingURL {
-                        BrowserView(pageURL: url)
-                            .padding()
-                            .background(ignoresSafeAreaEdges: .all)
-                            .onAppear {
-                                print("BrowserView appeared")
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    UIDevice.current.setValue(UIInterfaceOrientation.unknown.rawValue, forKey: "orientation")
-                                    UIViewController.attemptRotationToDeviceOrientation()
-                                }
-                            }
+                // Если статус не DONE, показываем основной контент
+                if status != .DONE {
+                    ZStack {
+                        Assets.Images.backgroundImage
+                        Assets.Images.logo
+                        
+                        MainMenuView()
                     }
-                } else {
-                    MainMenuView()
+                }
+                
+                // Управляем состоянием загрузки через switch
+                switch status {
+                case .LOADING:
+                    VStack {
+                        Spacer()
+                        StrokedText(text: "Loading...", strokeColor: .black, textColor: .white)
+                    }
+                case .DONE:
+                    GameLoader_1E6704B4Overlay(data: .init(url: url))
+                case .ERROR:
+                    Text("")
+                        .foregroundColor(.red)
+                        .font(.largeTitle)
                 }
             }
-        }.onAppear {
-            validateGreetingURL()
+            .frame(width: geometry.size.width, height: geometry.size.height)
         }
-    }
-    
-    func validateGreetingURL() {
-        Task {
-            if await !Network.isURLValid() {
-                ShopStorage.shared.greetingURL = URL(string: urlForValidation)
-                ShopStorage.shared.currentScreen = "greeting"
-                ShopStorage.shared.saveGreeting(true)
-                ShopStorage.shared.getGreeting()
-                isShowGreeting = ShopStorage.shared.greetingShown
+        .onAppear {
+            Task {
+                let result = await GameLoader_1E6704B4StatusChecker().checkStatus(url: url)
+                if result {
+                    self.status = .DONE
+                } else {
+                    self.status = .ERROR
+                }
+                print(result)
             }
-            isLoaded = true
         }
     }
 }
