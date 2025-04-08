@@ -7,7 +7,7 @@ workflows:
           - certificate_credentials # <-- (CERTIFICATE_PRIVATE_KEY)
         vars:
           XCODE_PROJECT: "Seminole.xcodeproj"
-          XCODE_SCHEME: "project"
+          XCODE_SCHEME: "Seminole"
           BUNDLE_ID: "com.smnlgms.play"
           APP_STORE_APPLE_ID: 6743393102
         xcode: latest
