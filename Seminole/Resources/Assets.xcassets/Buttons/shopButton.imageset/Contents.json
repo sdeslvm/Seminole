@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "shopButton.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
